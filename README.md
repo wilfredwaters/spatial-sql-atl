@@ -14,6 +14,11 @@ INSTALL spatial;
 LOAD spatial;
 ```
 
+## Map output
+
+Dekart draws only a geometry column named exactly `geometry` (lowercase). Every example and
+challenge returns its geometry under that name.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
