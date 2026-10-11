@@ -90,7 +90,6 @@ tr.hide { display: none; }
 pre { margin: 0; background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 0.8rem/1.55 var(--mono); }
 .fx pre { font-size: 0.74rem; padding-right: 76px; }
 .fx { margin-top: 6px; }
-.known { color: var(--signal); font-size: 0.82rem; margin: 4px 0 0; }
 td, .block, .sessions > details, .sbody, .qa, .codebox { min-width: 0; }
 .sessions table { table-layout: fixed; }
 .copy { position: absolute; top: 6px; right: 6px; font: 500 0.72rem var(--mono); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
@@ -129,7 +128,7 @@ a { color: var(--accent); }
 
   <section class="block">
     <h2>Sessions</h2>
-    <p class="legend"><b>⚑</b> may not run in Dekart's browser DuckDB (file and GDAL readers). Test before the session. Challenge SQL and function examples run in DuckDB 1.4.1. Dekart's browser DuckDB is untested.</p>
+    <p class="legend"><b>⚑</b> may not run in Dekart's browser DuckDB (file and GDAL readers). Test before the session. Challenge SQL and function examples run in DuckDB 1.5.6. Dekart's browser DuckDB is untested.</p>
     <div class="search">
       <input id="q" type="search" placeholder="Find a function, e.g. buffer" aria-label="Find a function" autocomplete="off">
       <span id="hits"></span>
@@ -508,13 +507,6 @@ SELECT ST_Translate(
   ask: "Load a Georgia OSM extract. Pick the first post-syllabus project." }
 ];
 
-// Examples that fail on DuckDB 1.4.1 (tested in examples.py)
-const BROKEN = {
-  "ST_LineString2DFromWKB": "Does not run on DuckDB 1.4.1: no WKB input accepted.",
-  "ST_Point2DFromWKB": "Does not run on DuckDB 1.4.1: no WKB input accepted.",
-  "ST_Polygon2DFromWKB": "Does not run on DuckDB 1.4.1: no WKB input accepted."
-};
-
 // One tested example per function, generated from examples.py
 const EX = {
  "DuckDB_PROJ_Compiled_Version": "SELECT DuckDB_PROJ_Compiled_Version() AS v;",
@@ -716,8 +708,7 @@ S.forEach((s, i) => {
   el.id = `s${i + 1}`;
   if (i === (nextIdx === -1 ? 0 : nextIdx)) { el.open = true; }
   const rows = s.f.map(([n, d, v]) => {
-    const note = BROKEN[n] ? `<p class="known">${esc(BROKEN[n])}</p>` : "";
-    return `<tr class="${v ? "verify" : ""}" data-n="${n.toLowerCase()} ${d.toLowerCase()}"><td>${n}</td><td>${esc(d)}${note}<div class="codebox fx"><pre><code>${esc(EX[n])}</code></pre><button class="copy" type="button">Copy</button></div></td></tr>`;
+    return `<tr class="${v ? "verify" : ""}" data-n="${n.toLowerCase()} ${d.toLowerCase()}"><td>${n}</td><td>${esc(d)}<div class="codebox fx"><pre><code>${esc(EX[n])}</code></pre><button class="copy" type="button">Copy</button></div></td></tr>`;
   }).join("");
   el.innerHTML = `
     <summary>

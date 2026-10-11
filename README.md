@@ -7,7 +7,7 @@ One meetup every two weeks covers one topic's set of functions, through April 20
 
 ## Run the examples
 
-Install [DuckDB](https://duckdb.org/docs/installation/), then in any session:
+Install [DuckDB](https://duckdb.org/docs/installation/) 1.5.6 or later (examples tested on 1.5.6), then in any session:
 
 ```sql
 INSTALL spatial;
