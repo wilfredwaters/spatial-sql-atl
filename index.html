@@ -128,6 +128,7 @@ a { color: var(--accent); }
 
   <section class="block">
     <h2>Sessions</h2>
+    <p class="legend"><b>Map line</b> Some functions return a 2D, 3D or 4D point, or a box, rather than a GEOMETRY. Dekart and DuckGL draw only GEOMETRY, so the Map line casts the output. The cast keeps z and m values.</p>
     <p class="legend"><b>⚑</b> may not run in Dekart's browser DuckDB (file and GDAL readers). Test before the session. Challenge SQL and function examples run in DuckDB 1.4.3 and 1.5.6. Dekart's browser build is untested.</p>
     <div class="search">
       <input id="q" type="search" placeholder="Find a function, e.g. buffer" aria-label="Find a function" autocomplete="off">
@@ -669,6 +670,20 @@ const EX = {
  "ST_Read_Meta": "SELECT * FROM ST_Read_Meta('sample.geojson');"
 };
 
+// Map-ready SQL for examples whose native output is not GEOMETRY (from examples.py)
+const MAP = {
+ "ST_Point2D": "SELECT ST_Point2D(-84.3915, 33.7539)::GEOMETRY AS geometry;",
+ "ST_Point3D": "SELECT ST_Point3D(-84.3915, 33.7539, 320)::GEOMETRY AS geometry;",
+ "ST_Point4D": "SELECT ST_Point4D(-84.3915, 33.7539, 320, 10)::GEOMETRY AS geometry;",
+ "ST_Point2DFromWKB": "SELECT ST_Point2DFromWKB(ST_AsWKB(ST_Point(-84.3915, 33.7539)))::GEOMETRY AS geometry;",
+ "ST_LineString2DFromWKB": "SELECT ST_LineString2DFromWKB(ST_AsWKB(ST_GeomFromText('LINESTRING(0 0, 1 1)')))::GEOMETRY AS geometry;",
+ "ST_Polygon2DFromWKB": "SELECT ST_Polygon2DFromWKB(ST_AsWKB(ST_MakeEnvelope(0, 0, 1, 1)))::GEOMETRY AS geometry;",
+ "ST_MakeBox2D": "SELECT ST_MakeBox2D(ST_Point(-84.4, 33.745), ST_Point(-84.38, 33.765))::GEOMETRY AS geometry;",
+ "ST_Extent": "SELECT ST_Extent(ST_Buffer(ST_Point(-84.3915, 33.7539), 0.01))::GEOMETRY AS geometry;",
+ "ST_Extent_Approx": "SELECT ST_Extent_Approx(ST_Point(-84.3915, 33.7539))::GEOMETRY AS geometry;",
+ "ST_GeneratePoints": "SELECT point::GEOMETRY AS geometry FROM ST_GeneratePoints(ST_MakeBox2D(ST_Point(-84.4, 33.745), ST_Point(-84.38, 33.765)), 20, 42);"
+};
+
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -708,7 +723,7 @@ S.forEach((s, i) => {
   el.id = `s${i + 1}`;
   if (i === (nextIdx === -1 ? 0 : nextIdx)) { el.open = true; }
   const rows = s.f.map(([n, d, v]) => {
-    return `<tr class="${v ? "verify" : ""}" data-n="${n.toLowerCase()} ${d.toLowerCase()}"><td>${n}</td><td>${esc(d)}<div class="codebox fx"><pre><code>${esc(EX[n])}</code></pre><button class="copy" type="button">Copy</button></div></td></tr>`;
+    return `<tr class="${v ? "verify" : ""}" data-n="${n.toLowerCase()} ${d.toLowerCase()}"><td>${n}</td><td>${esc(d)}<div class="codebox fx"><pre><code>${esc(EX[n])}</code></pre><button class="copy" type="button">Copy</button></div>${MAP[n] ? `<p class="label">Map line</p><div class="codebox fx"><pre><code>${esc(MAP[n])}</code></pre><button class="copy" type="button">Copy</button></div>` : ""}</td></tr>`;
   }).join("");
   el.innerHTML = `
     <summary>

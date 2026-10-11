@@ -19,6 +19,9 @@ LOAD spatial;
 Dekart draws only a geometry column named exactly `geometry` (lowercase). Every example and
 challenge returns its geometry under that name.
 
+Some functions return a 2D, 3D or 4D point, or a box, not a `GEOMETRY`. Those examples have a
+`MAP` entry in `examples.py` that casts the output with `::GEOMETRY` so it can be drawn.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

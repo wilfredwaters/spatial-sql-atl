@@ -183,3 +183,18 @@ EX = {
     "ST_ReadSHP": "SELECT * FROM ST_ReadSHP('marta_stops.shp') LIMIT 5;",
     "ST_Read_Meta": "SELECT * FROM ST_Read_Meta('sample.geojson');",
 }
+
+# Map-ready versions of examples whose native output is not GEOMETRY.
+# Dekart and DuckGL draw only GEOMETRY, so these cast the output first.
+MAP = {
+    "ST_Point2D": "SELECT ST_Point2D(-84.3915, 33.7539)::GEOMETRY AS geometry;",
+    "ST_Point3D": "SELECT ST_Point3D(-84.3915, 33.7539, 320)::GEOMETRY AS geometry;",
+    "ST_Point4D": "SELECT ST_Point4D(-84.3915, 33.7539, 320, 10)::GEOMETRY AS geometry;",
+    "ST_Point2DFromWKB": "SELECT ST_Point2DFromWKB(ST_AsWKB(ST_Point(-84.3915, 33.7539)))::GEOMETRY AS geometry;",
+    "ST_LineString2DFromWKB": "SELECT ST_LineString2DFromWKB(ST_AsWKB(ST_GeomFromText('LINESTRING(0 0, 1 1)')))::GEOMETRY AS geometry;",
+    "ST_Polygon2DFromWKB": "SELECT ST_Polygon2DFromWKB(ST_AsWKB(ST_MakeEnvelope(0, 0, 1, 1)))::GEOMETRY AS geometry;",
+    "ST_MakeBox2D": "SELECT ST_MakeBox2D(ST_Point(-84.4, 33.745), ST_Point(-84.38, 33.765))::GEOMETRY AS geometry;",
+    "ST_Extent": "SELECT ST_Extent(ST_Buffer(ST_Point(-84.3915, 33.7539), 0.01))::GEOMETRY AS geometry;",
+    "ST_Extent_Approx": "SELECT ST_Extent_Approx(ST_Point(-84.3915, 33.7539))::GEOMETRY AS geometry;",
+    "ST_GeneratePoints": "SELECT point::GEOMETRY AS geometry FROM ST_GeneratePoints(ST_MakeBox2D(ST_Point(-84.4, 33.745), ST_Point(-84.38, 33.765)), 20, 42);",
+}
