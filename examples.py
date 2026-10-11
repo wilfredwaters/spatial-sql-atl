@@ -128,7 +128,7 @@ EX = {
     "ST_PointOnSurface": f"SELECT ST_PointOnSurface({BOX}) AS geom;",
     "ST_Points": f"SELECT ST_Points({LINE}) AS geom;",
     "ST_Polygon2DFromWKB": "SELECT ST_Polygon2DFromWKB(ST_AsWKB(ST_MakeEnvelope(0, 0, 1, 1))) AS poly;",
-    "ST_Polygonize": "SELECT ST_Polygonize(ST_GeomFromText('MULTILINESTRING((0 0, 0 1, 1 1, 1 0, 0 0))')) AS geom;",
+    "ST_Polygonize": "SELECT ST_Polygonize([ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 1 0, 0 0)')]) AS geom;",
     "ST_QuadKey": "SELECT ST_QuadKey(-84.3915, 33.7539, 12) AS quadkey;",
     "ST_ReducePrecision": "SELECT ST_ReducePrecision(ST_Point(-84.391512345, 33.753987654), 0.001) AS geom;",
     "ST_RemoveRepeatedPoints": "SELECT ST_RemoveRepeatedPoints(ST_GeomFromText('LINESTRING(0 0, 0 0, 1 1)')) AS geom;",
@@ -177,7 +177,7 @@ EX = {
 
     # ---- Table functions ----
     "ST_Drivers": "SELECT * FROM ST_Drivers() LIMIT 5;",
-    "ST_GeneratePoints": "SELECT * FROM ST_GeneratePoints(ST_MakeEnvelope(-84.4, 33.745, -84.38, 33.765), 20, 42);",
+    "ST_GeneratePoints": "SELECT * FROM ST_GeneratePoints(ST_MakeBox2D(ST_Point(-84.4, 33.745), ST_Point(-84.38, 33.765)), 20, 42);",
     "ST_Read": "SELECT * FROM ST_Read('sample.geojson') LIMIT 5;",
     "ST_ReadOSM": "SELECT * FROM ST_ReadOSM('georgia-latest.osm.pbf') LIMIT 5;",
     "ST_ReadSHP": "SELECT * FROM ST_ReadSHP('marta_stops.shp') LIMIT 5;",
