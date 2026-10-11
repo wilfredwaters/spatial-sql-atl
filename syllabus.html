@@ -1,0 +1,600 @@
+<title>Spatial SQL ATL Syllabus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a 13-stop route strip up top, then each session as a collapsible stop. */
+:root {
+  --bg: #f2f5f3;
+  --surface: #ffffff;
+  --fg: #14231f;
+  --muted: #56665f;
+  --line: #d5ddd9;
+  --accent: #0d6b5b;
+  --accent-soft: #dcefe9;
+  --signal: #c98a00;
+  --signal-soft: #fbf0d4;
+  --code-bg: #e8eeeb;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1715; --surface: #16211e; --fg: #e3ebe7; --muted: #94a59e; --line: #2a3833;
+    --accent: #4fc3a9; --accent-soft: #19332d; --signal: #f0b733; --signal-soft: #33290f; --code-bg: #1c2a26;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1715; --surface: #16211e; --fg: #e3ebe7; --muted: #94a59e; --line: #2a3833;
+  --accent: #4fc3a9; --accent-soft: #19332d; --signal: #f0b733; --signal-soft: #33290f; --code-bg: #1c2a26;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; gap: 32px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+p { margin: 0; }
+.eyebrow { font: 500 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.lede { color: var(--muted); max-width: 62ch; }
+header { display: grid; gap: 12px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; font: 500 0.8rem var(--mono); }
+.facts span { background: var(--accent-soft); color: var(--accent); padding: 4px 10px; border-radius: 999px; }
+
+/* Route strip: one stop per session */
+.route { overflow-x: auto; padding-bottom: 4px; }
+.route ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 0; min-width: max-content; position: relative; }
+.route li { display: grid; justify-items: center; gap: 6px; width: 56px; position: relative; }
+.route li::before { content: ""; position: absolute; top: 9px; left: 0; right: 0; height: 2px; background: var(--line); }
+.route li:first-child::before { left: 50%; }
+.route li:last-child::before { right: 50%; }
+.route a { position: relative; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); display: block; }
+.route li.next a { background: var(--signal); border-color: var(--signal); }
+.route li.done a { background: var(--accent); }
+.route small { font: 500 0.68rem/1.2 var(--mono); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+.route li.gap small { color: var(--signal); }
+
+.block { display: grid; gap: 12px; }
+.agenda { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.agenda div { display: grid; grid-template-columns: 64px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.agenda time { font: 500 0.85rem var(--mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+.note { background: var(--signal-soft); border-left: 3px solid var(--signal); padding: 12px 14px; border-radius: 4px; font-size: 0.92rem; }
+
+.search { display: flex; gap: 8px; align-items: center; }
+.search input { flex: 1; min-width: 0; font: 0.95rem var(--mono); padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg); }
+.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+#hits { font: 0.8rem var(--mono); color: var(--muted); white-space: nowrap; }
+
+.sessions { display: grid; gap: 12px; }
+details.session { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+details.session[open] { border-color: var(--accent); }
+summary { list-style: none; cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; }
+summary::-webkit-details-marker { display: none; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 8px; }
+.num { font: 800 1.5rem var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.stitle { display: grid; gap: 2px; min-width: 0; }
+.stitle .eyebrow { letter-spacing: 0.04em; }
+.count { font: 500 0.75rem var(--mono); color: var(--muted); text-align: right; }
+.sbody { padding: 0 16px 18px; display: grid; gap: 16px; }
+.why { color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+td { padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td:first-child { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); width: 44%; padding-right: 12px; word-break: break-word; }
+tr.verify td:first-child::after { content: " ⚑"; color: var(--signal); }
+tr.hide { display: none; }
+.label { font: 600 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.codebox { position: relative; }
+pre { margin: 0; background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 0.8rem/1.55 var(--mono); }
+.copy { position: absolute; top: 6px; right: 6px; font: 500 0.72rem var(--mono); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.copy:focus-visible { outline: 2px solid var(--accent); }
+.qa { display: grid; gap: 6px; }
+.legend { font-size: 0.85rem; color: var(--muted); }
+.sources { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 0.92rem; }
+.sources code { font: 0.85em var(--mono); }
+.legend b { color: var(--signal); }
+footer { font-size: 0.85rem; color: var(--muted); display: grid; gap: 6px; }
+a { color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { details.session { transition: border-color .2s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Spatial SQL ATL · Atlanta</p>
+    <h1>158 functions, one map at a time</h1>
+    <p class="lede">Every DuckDB spatial function, in plain English, typed into Dekart so the result lands on a map. Every other Thursday, two hours, Oct 2026 to Apr 2027.</p>
+    <div class="facts"><span>13 sessions</span><span>158 functions</span><span>Thu, 2 hrs, biweekly</span><span>Free Dekart workspace</span></div>
+  </header>
+
+  <nav class="route" aria-label="Session dates"><ol id="route"></ol></nav>
+
+  <section class="block">
+    <h2>Every session runs the same way</h2>
+    <div class="agenda">
+      <div><time>0:00</time><p>Arrive. Name, and what you map. Newcomers first.</p></div>
+      <div><time>0:20</time><p>Recap: one person reruns last session's challenge from the saved map.</p></div>
+      <div><time>0:30</time><p>Functions. Each one: a volunteer reads the plain-English line, everyone types it in Dekart, we look at the map.</p></div>
+      <div><time>1:30</time><p>Atlanta challenge. Pairs. Save and share the map link.</p></div>
+      <div><time>1:50</time><p>Adopt next session's functions. Then drinks.</p></div>
+    </div>
+    <p class="note">Rule for every query: return a geometry column, so something appears on the map. A number alone shows nothing.</p>
+  </section>
+
+  <section class="block">
+    <h2>Sessions</h2>
+    <p class="legend"><b>⚑</b> may not run in Dekart's browser DuckDB (file and GDAL readers). Test before the session. All challenge SQL is untested until the dry run.</p>
+    <div class="search">
+      <input id="q" type="search" placeholder="Find a function, e.g. buffer" aria-label="Find a function" autocomplete="off">
+      <span id="hits"></span>
+    </div>
+    <div class="sessions" id="sessions"></div>
+  </section>
+
+  <section class="block" id="mobility">
+    <h2>Mobility track: runs on fake data today</h2>
+    <p class="lede">No downloads. Each query makes its own points, so the room can start in the first ten minutes. Run each one inside the session named.</p>
+
+    <div class="qa"><span class="label">Session 4 · Who touches whom</span>
+      <div class="codebox"><pre><code>-- 500 fake phone pings around downtown, one row each
+WITH pings AS (
+  SELECT i AS ping_id,
+         ST_Point(-84.3900 + (hash(i) % 1000) / 1000.0 * 0.04,
+                  33.7400  + (hash(i * 7) % 1000) / 1000.0 * 0.03) AS geom
+  FROM range(500) t(i)),
+zone AS (
+  SELECT ST_MakeEnvelope(-84.4000, 33.7450, -84.3800, 33.7650) AS geom)
+SELECT p.ping_id, p.geom,
+       ST_Within(p.geom, z.geom) AS in_zone
+FROM pings p, zone z;</code></pre><button class="copy" type="button">Copy</button></div>
+      <p>Roughly a quarter of pings should be in_zone. Widen the zone until half are. Then count them: <code>count(*) FILTER (WHERE in_zone)</code>.</p>
+    </div>
+
+    <div class="qa"><span class="label">Session 7 · Life along a line</span>
+      <div class="codebox"><pre><code>-- Snap each fake ping to the nearest point on a route
+WITH route AS (
+  SELECT ST_MakeLine(ST_Point(-84.3915, 33.7539),
+                     ST_Point(-84.3346, 33.9462)) AS line),
+pings AS (
+  SELECT i AS ping_id,
+         ST_Point(-84.3915 + (hash(i) % 1000) / 1000.0 * 0.06,
+                  33.7539  + (hash(i * 7) % 1000) / 1000.0 * 0.19) AS geom
+  FROM range(40) t(i))
+SELECT p.ping_id,
+       ST_LineLocatePoint(r.line, p.geom) AS fraction_along,
+       ST_LineInterpolatePoint(r.line,
+         ST_LineLocatePoint(r.line, p.geom)) AS snapped
+FROM pings p, route r;</code></pre><button class="copy" type="button">Copy</button></div>
+      <p>fraction_along is 0 to 1. Plot snapped on the map, then ask: what does a ping 2 km from the line become?</p>
+    </div>
+
+    <div class="qa"><span class="label">Real open data, after April or as a bonus</span>
+      <ul class="sources">
+        <li><b>MARTA GTFS</b>, transit stops and routes. Feed listed at <a href="https://mobilitydatabase.org/feeds/gtfs/mdb-368">mobilitydatabase.org (mdb-368)</a>. Unzip, then <code>read_csv('stops.txt')</code> and use <code>ST_Point(stop_lon, stop_lat)</code>.</li>
+        <li><b>NYC TLC trip records</b>, public taxi and rideshare trips with pickup and dropoff points. Use one month; the files are large.</li>
+        <li><b>Synthetic GPS</b>, research datasets: <a href="https://arxiv.org/pdf/2412.00913">Garden City (arXiv 2412.00913)</a> and <a href="https://neurips.cc/virtual/2023/poster/73469">SynMob (NeurIPS 2023)</a>.</li>
+        <li><b>WorldMove</b>, open global human mobility data: <a href="https://arxiv.org/pdf/2504.10506">arXiv 2504.10506</a>.</li>
+      </ul>
+      <p class="why">Check each licence before sharing a file in the group workspace. I confirmed the links above, not the licence terms or the current download files.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>No session Thu 31 Dec. After April: real Atlanta projects in Dekart (MARTA access, tree canopy, flood exposure).</p>
+    <p>Dekart workspace courtesy of Volodymyr Bilonenko, Oct 2026 to Oct 2027. Function list from the <a href="https://duckdb.org/docs/current/core_extensions/spatial/functions.html">DuckDB spatial docs</a> (v1.5).</p>
+  </footer>
+</div>
+
+<script>
+// Landmarks reused across challenges (lon, lat)
+const S = [
+{ t: "Make a shape, look at a shape", d: "2026-10-22",
+  why: "Points, lines and boxes from numbers and text, then measure them.",
+  f: [
+  ["ST_Point","Drop a pin at x, y. Longitude first."],
+  ["ST_MakePoint","Same pin, older name."],
+  ["ST_GeomFromText","Turn text like 'POINT(1 2)' into a shape."],
+  ["ST_AsText","Turn a shape back into readable text."],
+  ["ST_GeometryType","Is it a point, line or polygon?"],
+  ["ST_X","A pin's left-right number."],
+  ["ST_Y","A pin's up-down number."],
+  ["ST_MakeLine","Join pins into a line."],
+  ["ST_MakeEnvelope","Draw a rectangle from its corners."],
+  ["ST_Area","How much space a shape covers."],
+  ["ST_Length","How long a line is."],
+  ["ST_Distance","Straight-line gap between two shapes."]],
+  warm: "Why is longitude first? Because x is left-right.",
+  sql: `-- Five Points MARTA to Georgia Tech
+SELECT ST_MakeLine(
+         ST_Point(-84.3915, 33.7539),
+         ST_Point(-84.3963, 33.7756)) AS geom,
+       ST_Length(geom) AS len;`,
+  ask: "len is about 0.022. 0.022 what? Degrees, not miles. Cliffhanger for session 3." },
+
+{ t: "Files in, files out", d: "2026-11-05",
+  why: "How shapes are stored and moved between tools.",
+  f: [
+  ["ST_Read","Open almost any GIS file (shapefile, GeoPackage, KML) as a table.",1],
+  ["ST_Drivers","List the file types ST_Read can open.",1],
+  ["ST_Read_Meta","Peek at a file's layers and coordinate system without loading it.",1],
+  ["ST_ReadSHP","Open a shapefile without GDAL.",1],
+  ["ST_AsGeoJSON","Shape to GeoJSON, the web's map format."],
+  ["ST_GeomFromGeoJSON","GeoJSON back to a shape."],
+  ["ST_AsWKB","Shape to compact binary, how databases store it."],
+  ["ST_GeomFromWKB","Binary back to a shape."],
+  ["ST_AsHEXWKB","Binary written as hex text, so you can paste it."],
+  ["ST_GeomFromHEXWKB","Hex text back to a shape."],
+  ["ST_GeomFromHEXEWKB","Same, for PostGIS-style hex. An alias here."],
+  ["ST_AsSVG","Shape to an SVG drawing path."],
+  ["ST_MakePolygon","Close a line into a filled polygon."]],
+  warm: "Who has a shapefile on their laptop right now? Upload it to Dekart.",
+  sql: `-- Piedmont Park, roughly, round-tripped through GeoJSON
+SELECT ST_GeomFromGeoJSON(
+         ST_AsGeoJSON(
+           ST_MakeEnvelope(-84.3800, 33.7800, -84.3680, 33.7890)
+         )) AS geom;`,
+  ask: "Did anything change on the round trip? Compare ST_AsText before and after." },
+
+{ t: "Measuring on a round earth", d: "2026-11-19",
+  why: "Degrees are not distance. Fix that.",
+  f: [
+  ["ST_Transform","Re-project a shape into another coordinate system."],
+  ["ST_FlipCoordinates","Swap x and y. Fixes lat/lon mix-ups."],
+  ["DuckDB_Proj_Version","Which projection library version is running."],
+  ["DuckDB_PROJ_Compiled_Version","Which version DuckDB was built against."],
+  ["ST_Distance_Sphere","Distance in metres on a ball-shaped earth."],
+  ["ST_Distance_Spheroid","Distance in metres on a squashed-ball earth. Most accurate."],
+  ["ST_Area_Spheroid","Area in square metres on the real earth."],
+  ["ST_Length_Spheroid","Line length in metres on the real earth."],
+  ["ST_Perimeter","Distance around a shape's edge, in its units."],
+  ["ST_Perimeter_Spheroid","Same, in metres on the real earth."],
+  ["ST_DWithin_Spheroid","Are two points within N metres?"],
+  ["ST_Azimuth","Compass bearing from one point to another, in radians."]],
+  warm: "The spheroid functions want lat, lon. The opposite of session 1. Why the trap?",
+  sql: `-- Hartsfield-Jackson to Dunwoody, in metres
+-- Note: spheroid functions take (lat, lon)
+SELECT ST_Distance_Spheroid(
+         ST_Point(33.6407, -84.4277),
+         ST_Point(33.9462, -84.3346)) AS metres,
+       ST_MakeLine(ST_Point(-84.4277, 33.6407),
+                   ST_Point(-84.3346, 33.9462)) AS geom;`,
+  ask: "Now ST_Transform the line to EPSG:2240 (Georgia West, US feet) and take ST_Length. Do the numbers agree?" },
+
+{ t: "Who touches whom", d: "2026-12-03",
+  why: "Yes/no questions between two shapes. The heart of spatial joins.",
+  f: [
+  ["ST_Intersects","Do they share any space at all?"],
+  ["ST_Contains","Is B completely inside A?"],
+  ["ST_Within","Is A completely inside B? Contains, flipped."],
+  ["ST_Touches","Do they meet at the edge only?"],
+  ["ST_Crosses","Does a line cut across the other shape?"],
+  ["ST_Overlaps","Do two same-type shapes partly overlap?"],
+  ["ST_Disjoint","Nothing in common at all."],
+  ["ST_Equals","Same shape, even if drawn differently."],
+  ["ST_Covers","Like Contains, but counts points on the edge."],
+  ["ST_CoveredBy","Like Within, but counts points on the edge."],
+  ["ST_ContainsProperly","Inside, and not touching the edge."],
+  ["ST_WithinProperly","Within, and not touching the edge."],
+  ["ST_DWithin","Are they within N units of each other?"]],
+  warm: "Draw two overlapping boxes on paper. Which of the 13 are true?",
+  sql: `-- Is Mercedes-Benz Stadium inside a downtown box?
+WITH downtown AS (
+  SELECT ST_MakeEnvelope(-84.4000, 33.7450, -84.3800, 33.7650) AS geom)
+SELECT geom,
+       ST_Contains(geom, ST_Point(-84.4008, 33.7554)) AS inside
+FROM downtown;`,
+  ask: "It is just outside the box's west edge. Widen the box until inside is true." },
+
+{ t: "Cut, join, grow", d: "2026-12-17",
+  why: "Make new shapes from old ones. Buffers and overlays.",
+  f: [
+  ["ST_Buffer","Grow a shape outward by a distance."],
+  ["ST_Union","Merge two shapes into one."],
+  ["ST_Intersection","Keep only the part both shapes share."],
+  ["ST_Difference","A, with B cut out of it."],
+  ["ST_Union_Agg","Merge every shape in a column into one."],
+  ["ST_MemUnion_Agg","Same, using less memory and more time."],
+  ["ST_Intersection_Agg","The area every shape in a column shares."],
+  ["ST_ShortestLine","Draw the shortest line between two shapes."],
+  ["ST_Centroid","The balance point of a shape."],
+  ["ST_DWithin_GEOS","DWithin, using the GEOS engine."],
+  ["ST_Distance_GEOS","Distance, using the GEOS engine."],
+  ["ST_Intersects_Extent","Do their bounding boxes overlap? Fast first filter."]],
+  warm: "Buffer is in the shape's units. What does a buffer of 0.01 degrees look like?",
+  sql: `-- Quarter-mile (1320 ft) walk zone around Five Points
+SELECT ST_Transform(
+         ST_Buffer(
+           ST_Transform(ST_Point(-84.3915, 33.7539),
+                        'EPSG:4326', 'EPSG:2240', always_xy := true),
+           1320),
+         'EPSG:2240', 'EPSG:4326', always_xy := true) AS geom;`,
+  ask: "Add Peachtree Center and union the two zones. Last session of 2026: bring snacks." },
+
+{ t: "Boxes and hulls", d: "2027-01-14",
+  why: "Wrap a shape, or many shapes, in a simpler outline.",
+  f: [
+  ["ST_Envelope","The tightest straight box around a shape, as a polygon."],
+  ["ST_Extent","Same box, as a compact BOX_2D."],
+  ["ST_Extent_Agg","One box around every shape in a column."],
+  ["ST_Envelope_Agg","Alias of ST_Extent_Agg."],
+  ["ST_MakeBox2D","Make a BOX_2D from two corner points."],
+  ["ST_XMin","Leftmost x of a shape."],
+  ["ST_XMax","Rightmost x."],
+  ["ST_YMin","Lowest y."],
+  ["ST_YMax","Highest y."],
+  ["ST_ConvexHull","Stretch a rubber band around the shape."],
+  ["ST_ConcaveHull","Shrink-wrap it. Tighter than the rubber band."],
+  ["ST_MinimumRotatedRectangle","Smallest box allowed to tilt."],
+  ["ST_MaximumInscribedCircle","Biggest circle that fits inside."],
+  ["ST_PointOnSurface","A point guaranteed to be inside the shape."]],
+  warm: "When is a centroid outside its own shape? Think of a crescent.",
+  sql: `-- Rubber band around six Atlanta landmarks
+SELECT ST_ConvexHull(ST_Collect([
+  ST_Point(-84.3915, 33.7539),  -- Five Points
+  ST_Point(-84.3963, 33.7756),  -- Georgia Tech
+  ST_Point(-84.3733, 33.7851),  -- Piedmont Park
+  ST_Point(-84.4277, 33.6407),  -- Airport
+  ST_Point(-84.3346, 33.9462),  -- Dunwoody
+  ST_Point(-84.1450, 33.8053)   -- Stone Mountain
+])) AS geom;`,
+  ask: "Swap in ST_ConcaveHull with ratio 0.3. What changes?" },
+
+{ t: "Life along a line", d: "2027-01-28",
+  why: "Routes, pipes and power lines. Where along it, how far, which bit.",
+  f: [
+  ["ST_StartPoint","First point of a line."],
+  ["ST_EndPoint","Last point of a line."],
+  ["ST_PointN","The Nth point of a line."],
+  ["ST_NPoints","How many points a shape has."],
+  ["ST_NumPoints","Same, other name."],
+  ["ST_LineInterpolatePoint","The point X% of the way along."],
+  ["ST_LineInterpolatePoints","A point every X% along."],
+  ["ST_LineLocatePoint","How far along the line is this point? 0 to 1."],
+  ["ST_LineSubstring","Cut out the piece between two fractions."],
+  ["ST_LineMerge","Stitch touching lines into longer ones."],
+  ["ST_Reverse","Flip the line's direction."],
+  ["ST_RemoveRepeatedPoints","Drop duplicate points in a row."]],
+  warm: "Utility people: this is linear referencing. Where else do you use it?",
+  sql: `-- Halfway from Five Points to Dunwoody
+SELECT ST_LineInterpolatePoint(
+         ST_MakeLine(ST_Point(-84.3915, 33.7539),
+                     ST_Point(-84.3346, 33.9462)),
+         0.5) AS geom;`,
+  ask: "Put a marker every 10% with ST_LineInterpolatePoints." },
+
+{ t: "Broken shapes", d: "2027-02-11",
+  why: "Real data is messy. Find the problems, fix them, slim them down.",
+  f: [
+  ["ST_IsValid","Is the shape legal? No self-crossing edges."],
+  ["ST_MakeValid","Repair an illegal shape."],
+  ["ST_IsSimple","Does a line never cross itself?"],
+  ["ST_IsEmpty","Is there anything there at all?"],
+  ["ST_IsClosed","Does the line end where it started?"],
+  ["ST_IsRing","Closed and simple. A proper loop."],
+  ["ST_Simplify","Drop points to make it lighter. May break shapes."],
+  ["ST_SimplifyPreserveTopology","Drop points without breaking the shape."],
+  ["ST_ReducePrecision","Round coordinates to a grid."],
+  ["ST_Normalize","Put points in a standard order, for comparing."],
+  ["ST_Node","Add a point wherever lines cross."],
+  ["ST_Dimension","0 for points, 1 for lines, 2 for areas."]],
+  warm: "Everyone shares the worst geometry they have met at work.",
+  sql: `-- A bow-tie: edges cross, so it is invalid
+SELECT g AS before,
+       ST_IsValid(g) AS ok,
+       ST_MakeValid(g) AS geom
+FROM (SELECT ST_GeomFromText(
+  'POLYGON((-84.40 33.74, -84.38 33.76, -84.38 33.74, -84.40 33.76, -84.40 33.74))'
+) AS g);`,
+  ask: "What type did ST_MakeValid return? Check with ST_GeometryType." },
+
+{ t: "Holes, rings and bundles", d: "2027-02-25",
+  why: "Shapes inside shapes, and many shapes in one row.",
+  f: [
+  ["ST_ExteriorRing","The outer edge of a polygon, as a line."],
+  ["ST_NInteriorRings","How many holes a polygon has."],
+  ["ST_NumInteriorRings","Same, other name."],
+  ["ST_Boundary","The edge of any shape."],
+  ["ST_BuildArea","Fill closed lines into a polygon, keeping holes as holes."],
+  ["ST_Polygonize","Turn a tangle of lines into polygons."],
+  ["ST_Collect","Bundle a list of shapes into one multi-shape."],
+  ["ST_CollectionExtract","Pull only points, lines or polygons from a bundle."],
+  ["ST_Dump","Unbundle into separate pieces."],
+  ["ST_Multi","Make a single shape a one-item multi-shape."],
+  ["ST_NGeometries","How many pieces in the bundle."],
+  ["ST_NumGeometries","Same, other name."],
+  ["ST_Points","Every vertex, as a multipoint."]],
+  warm: "Name an Atlanta polygon with a hole in it.",
+  sql: `-- Bundle three landmarks, then unbundle them into rows
+SELECT UNNEST(ST_Dump(ST_Collect([
+  ST_Point(-84.3915, 33.7539),
+  ST_Point(-84.3963, 33.7756),
+  ST_Point(-84.3733, 33.7851)
+])), recursive := true);`,
+  ask: "Draw a square park with a square pond. Count its interior rings." },
+
+{ t: "Height and measure", d: "2027-03-11",
+  why: "Z is elevation. M is any measure, like mileposts or time.",
+  f: [
+  ["ST_Z","A point's height."],
+  ["ST_ZMin","Lowest height in a shape."],
+  ["ST_ZMax","Highest height."],
+  ["ST_M","A point's measure value."],
+  ["ST_MMin","Smallest measure in a shape."],
+  ["ST_MMax","Largest measure."],
+  ["ST_HasZ","Does it have heights?"],
+  ["ST_HasM","Does it have measures?"],
+  ["ST_ZMFlag","Code for which extras it has: none, M, Z or both."],
+  ["ST_Force2D","Drop heights and measures."],
+  ["ST_Force3DZ","Add a height to every point."],
+  ["ST_Force3DM","Add a measure to every point."],
+  ["ST_Force4D","Add both."],
+  ["ST_LocateAlong","Find the point at measure M."],
+  ["ST_LocateBetween","Cut the piece between two measures."],
+  ["ST_InterpolatePoint","The measure at the spot nearest a point."]],
+  warm: "The map is flat. Where do Z and M show up in your work?",
+  sql: `-- Stone Mountain summit, about 514 m
+SELECT ST_Force3DZ(ST_Point(-84.1450, 33.8053), 514) AS geom,
+       ST_Z(geom) AS metres,
+       ST_ZMFlag(geom) AS flag;`,
+  ask: "Make a MARTA line with M as minutes from Five Points. Locate minute 10." },
+
+{ t: "Tiling the city", d: "2027-03-25",
+  why: "Cover an area with no gaps or overlaps, or carve it into zones.",
+  f: [
+  ["ST_CoverageInvalidEdges","Find edges where neighbouring polygons don't line up."],
+  ["ST_CoverageSimplify","Simplify neighbours without opening gaps."],
+  ["ST_CoverageUnion","Merge neighbours that fit together. Fast."],
+  ["ST_CoverageInvalidEdges_Agg","Bad edges across a whole column."],
+  ["ST_CoverageSimplify_Agg","Gap-free simplify across a whole column."],
+  ["ST_CoverageUnion_Agg","Gap-free merge across a whole column."],
+  ["ST_VoronoiDiagram","Split space so each zone is nearest one point."],
+  ["ST_GeneratePoints","Scatter random points in a box."]],
+  warm: "Census tracts, counties, parcels. Why must they not overlap?",
+  sql: `-- Which landmark is nearest? Voronoi zones
+SELECT ST_VoronoiDiagram(ST_Collect([
+  ST_Point(-84.3915, 33.7539),
+  ST_Point(-84.3963, 33.7756),
+  ST_Point(-84.3733, 33.7851),
+  ST_Point(-84.4277, 33.6407),
+  ST_Point(-84.3346, 33.9462),
+  ST_Point(-84.1450, 33.8053)
+])) AS geom;`,
+  ask: "Short session on functions. Use the spare time on a group Atlanta dataset." },
+
+{ t: "Tiles and speed", d: "2027-04-08",
+  why: "How web maps chop the world into tiles, plus fast typed shapes.",
+  f: [
+  ["ST_TileEnvelope","The box for map tile zoom/x/y."],
+  ["ST_QuadKey","The Bing-style tile code for a point."],
+  ["ST_Hilbert","A number that keeps nearby things near in sort order."],
+  ["ST_AsMVTGeom","Clip and scale a shape to fit one vector tile."],
+  ["ST_AsMVT","Pack shapes into a vector tile."],
+  ["ST_Point2D","A fast 2D point type."],
+  ["ST_Point3D","A fast 3D point type."],
+  ["ST_Point4D","A fast point with height and measure."],
+  ["ST_Point2DFromWKB","Binary to fast 2D point."],
+  ["ST_LineString2DFromWKB","Binary to fast 2D line."],
+  ["ST_Polygon2DFromWKB","Binary to fast 2D polygon."],
+  ["ST_Extent_Approx","The cached rough bounding box. Internal, may change."]],
+  warm: "Zoom 0 is one tile. How many tiles at zoom 12?",
+  sql: `-- Downtown Atlanta's zoom-12 tile
+SELECT ST_TileEnvelope(12, 1087, 1639) AS geom,
+       ST_QuadKey(-84.3915, 33.7539, 12) AS quadkey;`,
+  ask: "Is Five Points inside that tile? Use session 4." },
+
+{ t: "Move it, and graduate", d: "2027-04-22",
+  why: "Shift, scale and spin shapes. Then all of OpenStreetMap.",
+  f: [
+  ["ST_Affine","Apply any move, stretch or spin with a matrix."],
+  ["ST_Translate","Slide a shape by dx, dy."],
+  ["ST_Scale","Stretch a shape by a factor."],
+  ["ST_TransScale","Slide then stretch."],
+  ["ST_Rotate","Spin around the origin. Alias of ST_RotateZ."],
+  ["ST_RotateZ","Spin flat on the map."],
+  ["ST_RotateX","Tilt around the x axis."],
+  ["ST_RotateY","Tilt around the y axis."],
+  ["ST_ReadOSM","Read an OpenStreetMap .osm.pbf file directly.",1]],
+  warm: "158 down. What do we build together next?",
+  sql: `-- Slide Piedmont Park onto Stone Mountain
+SELECT ST_Translate(
+         ST_MakeEnvelope(-84.3800, 33.7800, -84.3680, 33.7890),
+         0.2290, 0.0208) AS geom;`,
+  ask: "Load a Georgia OSM extract. Pick the first post-syllabus project." }
+];
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+function fmt(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return { short: `${d} ${MONTHS[m - 1]}`, long: `Thu ${d} ${MONTHS[m - 1]} ${y}`, date: new Date(y, m - 1, d) };
+}
+
+const nextIdx = S.findIndex(s => fmt(s.d).date >= today);
+
+// Route strip, with the Christmas gap marked
+const route = document.getElementById("route");
+S.forEach((s, i) => {
+  if (s.d === "2027-01-14") {
+    const gap = document.createElement("li");
+    gap.className = "gap";
+    gap.innerHTML = `<small>31 Dec<br>off</small>`;
+    route.appendChild(gap);
+  }
+  const li = document.createElement("li");
+  if (i === nextIdx) { li.className = "next"; }
+  else if (nextIdx === -1 || i < nextIdx) { li.className = "done"; }
+  li.innerHTML = `<a href="#s${i + 1}" aria-label="Session ${i + 1}, ${fmt(s.d).long}"></a><small>${i + 1}<br>${fmt(s.d).short}</small>`;
+  li.querySelector("a").addEventListener("click", () => { document.getElementById(`s${i + 1}`).open = true; });
+  route.appendChild(li);
+});
+
+// Sessions
+const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const box = document.getElementById("sessions");
+let total = 0;
+S.forEach((s, i) => {
+  total += s.f.length;
+  const el = document.createElement("details");
+  el.className = "session";
+  el.id = `s${i + 1}`;
+  if (i === (nextIdx === -1 ? 0 : nextIdx)) { el.open = true; }
+  const rows = s.f.map(([n, d, v]) =>
+    `<tr class="${v ? "verify" : ""}" data-n="${n.toLowerCase()} ${d.toLowerCase()}"><td>${n}</td><td>${esc(d)}</td></tr>`).join("");
+  el.innerHTML = `
+    <summary>
+      <span class="num">${String(i + 1).padStart(2, "0")}</span>
+      <span class="stitle"><span class="eyebrow">${fmt(s.d).long}</span><h3>${s.t}</h3></span>
+      <span class="count">${s.f.length} fns</span>
+    </summary>
+    <div class="sbody">
+      <p class="why">${s.why}</p>
+      <table><tbody>${rows}</tbody></table>
+      <div class="qa"><span class="label">Warm-up</span><p>${esc(s.warm)}</p></div>
+      <div class="qa"><span class="label">Atlanta challenge</span>
+        <div class="codebox"><pre><code>${esc(s.sql)}</code></pre><button class="copy" type="button">Copy</button></div>
+        <p>${esc(s.ask)}</p>
+      </div>
+    </div>`;
+  box.appendChild(el);
+});
+
+// Copy buttons
+document.addEventListener("click", e => {
+  const b = e.target.closest(".copy");
+  if (!b) { return; }
+  const code = b.previousElementSibling.textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    b.textContent = "Copied";
+    setTimeout(() => { b.textContent = "Copy"; }, 1500);
+  }).catch(() => {
+    const r = document.createRange();
+    r.selectNodeContents(b.previousElementSibling);
+    getSelection().removeAllRanges();
+    getSelection().addRange(r);
+  });
+});
+
+// Search: filter rows, open sessions that match
+const q = document.getElementById("q");
+const hits = document.getElementById("hits");
+hits.textContent = `${total} total`;
+q.addEventListener("input", () => {
+  const term = q.value.trim().toLowerCase();
+  let n = 0;
+  box.querySelectorAll("details").forEach(d => {
+    let any = 0;
+    d.querySelectorAll("tr").forEach(r => {
+      const show = !term || r.dataset.n.includes(term);
+      r.classList.toggle("hide", !show);
+      any += show;
+    });
+    d.hidden = term && !any;
+    if (term && any) { d.open = true; }
+    n += any;
+  });
+  hits.textContent = term ? `${n} match${n === 1 ? "" : "es"}` : `${total} total`;
+});
+</script>
